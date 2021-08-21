@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 911922facb0eaef409347808e85f938f, type: 3}
+  m_Name: HeraSyndulla
+  m_EditorClassIdentifier: 
+  characterName: Hera Syndulla
+  characterTags: 0000000001000000020000000300000004000000
+  strength: 621
+  agility: 536
+  tactics: 917
+  mastery: 0
+  health: 13345
+  shield: 9042
+  speed: 127
+  critDamageMultiplier: 1.5
+  potency: 0.1831
+  tenacity: 0.3
+  healthSteal: 0
+  defencePenetration: 0
+  damagePhysical: 1638
+  criticalChancePhysical: 0.231
+  armourPenetration: 10
+  accuracyPhysical: 0
+  armour: 0.212
+  dodgeChance: 0.02
+  criticalAvoidancePhysical: 0
+  damageSpecial: 2415
+  criticalChance: 0.1294
+  resistancePenetration: 0
+  acurracySpecial: 0
+  resistance: 0.273
+  deflectionChance: 0.02
+  criticalAvoidanceSpecial: 0

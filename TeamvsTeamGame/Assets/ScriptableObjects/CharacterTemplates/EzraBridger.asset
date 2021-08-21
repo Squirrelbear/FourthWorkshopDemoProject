@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 911922facb0eaef409347808e85f938f, type: 3}
+  m_Name: EzraBridger
+  m_EditorClassIdentifier: 
+  characterName: Ezra Bridger
+  characterTags: 0000000008000000070000000300000004000000
+  strength: 643
+  agility: 916
+  tactics: 510
+  mastery: 0
+  health: 11843
+  shield: 8508
+  speed: 125
+  critDamageMultiplier: 1.542
+  potency: 0.34
+  tenacity: 0.23
+  healthSteal: 0.05
+  defencePenetration: 0
+  damagePhysical: 1760
+  criticalChancePhysical: 0.3746
+  armourPenetration: 40
+  accuracyPhysical: 0
+  armour: 0.203
+  dodgeChance: 0.02
+  criticalAvoidancePhysical: 0
+  damageSpecial: 1277
+  criticalChance: 0.18
+  resistancePenetration: 0
+  acurracySpecial: 0
+  resistance: 0.082
+  deflectionChance: 0.02
+  criticalAvoidanceSpecial: 0
