@@ -6,6 +6,7 @@ using UnityEngine;
 public class UnitAttackBehaviour : MonoBehaviour
 {
     public event Action<UnitAttackBehaviour> OnAttackTargetReached;
+    public event Action<UnitAttackBehaviour> OnFinishedReturn;
 
     public enum AttackState { WaitingCommand, MovingToTarget, ReturnToOrigin }
     [SerializeField]
@@ -73,6 +74,7 @@ public class UnitAttackBehaviour : MonoBehaviour
         StartCoroutine(moveToPosition(transform, origin, timeToReturn, 1));
         yield return new WaitForSeconds(timeToReturn);
         attackState = AttackState.WaitingCommand;
+        OnFinishedReturn?.Invoke(this);
         yield return null;
     }
 

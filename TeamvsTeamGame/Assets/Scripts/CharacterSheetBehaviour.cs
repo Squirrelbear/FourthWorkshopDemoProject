@@ -14,10 +14,13 @@ public class CharacterSheetBehaviour : MonoBehaviour
     [SerializeField] private string characterName;
     [SerializeField] private HashSet<CharacterTemplate.CharacterTag> characterTags;
 
+    public List<StatusEffect> statusEffects;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        statusEffects = new List<StatusEffect>();
+        initialiseFromTemplate();
     }
 
     // Update is called once per frame
@@ -64,6 +67,7 @@ public class CharacterSheetBehaviour : MonoBehaviour
         statValues = new Dictionary<string, float>();
         name = baseStats.name;
 
+        characterTags = new HashSet<CharacterTemplate.CharacterTag>();
         foreach(var charTag in baseStats.characterTags)
         {
             characterTags.Add(charTag);
@@ -91,5 +95,7 @@ public class CharacterSheetBehaviour : MonoBehaviour
         statValues.Add("resistance", baseStats.resistance);
         statValues.Add("deflectionChance", baseStats.deflectionChance);
         statValues.Add("criticalAvoidanceSpecial", baseStats.criticalAvoidanceSpecial);
+
+        statValues.Add("counterChance", 0);
     }
 }
