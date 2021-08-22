@@ -153,10 +153,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerUnits:
-  - {fileID: 1179337173}
+  - {fileID: 1179337177}
   enemyUnits:
-  - {fileID: 2037033969}
-  currentPlayerTarget: {fileID: 2037033969}
+  - {fileID: 2037033972}
+  currentPlayerTarget: {fileID: 2037033972}
+  testAttackTarget: {fileID: 2037033969}
+  testAttacker: {fileID: 0}
+  testHealthBar: {fileID: 1870422138}
 --- !u!4 &30665605
 Transform:
   m_ObjectHideFlags: 0
@@ -2167,6 +2170,7 @@ GameObject:
   - component: {fileID: 1179337174}
   - component: {fileID: 1179337176}
   - component: {fileID: 1179337177}
+  - component: {fileID: 1179337178}
   m_Layer: 0
   m_Name: BasicSpider
   m_TagString: Untagged
@@ -2235,6 +2239,24 @@ MonoBehaviour:
   baseStats: {fileID: 11400000, guid: b192fa7b6dcabf34e91d71f47f61c43f, type: 2}
   characterName: 
   statusEffects: []
+--- !u!114 &1179337178
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1179337173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccc12a9c6dd846b40bdbe6e67c2973d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healthCurrent: 0
+  shieldCurrent: 0
+  protectionCurrent: 0
+  shieldMax: 0
+  healthMax: 0
+  invulnerable: 0
 --- !u!1001 &1325003004
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3175,7 +3197,7 @@ RectTransform:
   m_GameObject: {fileID: 1870422136}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 90646607}
   - {fileID: 424277755}
@@ -3208,6 +3230,8 @@ MonoBehaviour:
   healthLabel: {fileID: 1480737992}
   shieldLabel: {fileID: 1099343063}
   protectionLabel: {fileID: 833367428}
+  nameLabel: {fileID: 90646608}
+  firstUpdate: 1
 --- !u!114 &1870422139
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -19,6 +19,10 @@ public class HealthBarBehaviour : MonoBehaviour
     private TMPro.TextMeshProUGUI shieldLabel;
     [SerializeField]
     private TMPro.TextMeshProUGUI protectionLabel;
+    [SerializeField]
+    private TMPro.TextMeshProUGUI nameLabel;
+
+    public bool firstUpdate = true;
 
     // Start is called before the first frame update
     void OnDisable()
@@ -32,7 +36,11 @@ public class HealthBarBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        if(firstUpdate)
+        {
+            firstUpdate = false;
+            updateHealth(unitHealth);
+        }
     }
 
     public void setAssociatedUnit(UnitHealthBehaviour unitHealthBehaviour)
@@ -46,7 +54,7 @@ public class HealthBarBehaviour : MonoBehaviour
         Vector3 objectPos = Camera.main.WorldToScreenPoint(unitHealth.gameObject.transform.position);
         transform.position = objectPos;
         unitHealth.UnitHealthChanged += updateHealth;
-        updateHealth(unitHealth);
+        //updateHealth(unitHealth);
     }
 
     private void updateHealth(UnitHealthBehaviour unitHealth)
@@ -58,5 +66,7 @@ public class HealthBarBehaviour : MonoBehaviour
         protectionLabel.text = unitHealth.protectionCurrent.ToString();
         shieldLabel.text = unitHealth.shieldCurrent.ToString();
         healthLabel.text = unitHealth.healthCurrent.ToString();
+
+        nameLabel.text = unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().characterName;
     }
 }

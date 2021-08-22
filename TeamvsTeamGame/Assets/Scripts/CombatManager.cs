@@ -6,22 +6,37 @@ using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
-    public event Action<GameObject> OnCharacterTurnEnded;
-    public event Action<GameObject> OnInitialSetup;
-    public event Action<GameObject> OnPlayerTargetChanged;
+    public event Action<CharacterSheetBehaviour> OnCharacterTurnStart;
+    public event Action<CharacterSheetBehaviour> OnCharacterTurnEnded;
+    public event Action<CharacterSheetBehaviour> OnInitialSetup;
+    public event Action<CharacterSheetBehaviour> OnPlayerTargetChanged;
 
     public Queue<QueuedAttack> attackQueue;
     public static CombatManager instance;
 
-    public List<GameObject> playerUnits;
-    public List<GameObject> enemyUnits;
+    public List<CharacterSheetBehaviour> playerUnits;
+    public List<CharacterSheetBehaviour> enemyUnits;
 
-    public GameObject currentPlayerTarget; 
+    public CharacterSheetBehaviour currentPlayerTarget; 
 
     void Awake()
     {
         instance = this;
         attackQueue = new Queue<QueuedAttack>();
+        OnCharacterTurnEnded += handleEndOfTurn;
+        handleEndOfTurn(null);
+    }
+
+    [SerializeField]
+    private GameObject testAttackTarget;
+    [SerializeField]
+    private GameObject testAttacker;
+    [SerializeField]
+    private HealthBarBehaviour testHealthBar;
+
+    private void Start()
+    {
+        testHealthBar.setAssociatedUnit(testAttackTarget.GetComponent<UnitHealthBehaviour>());
     }
 
     private void Update()
@@ -48,7 +63,7 @@ public class CombatManager : MonoBehaviour
 
     public void selectFirstValidPlayerTarget()
     {
-        List<GameObject> validTargets = getValidTargets(enemyUnits);
+        List<CharacterSheetBehaviour> validTargets = getValidTargets(enemyUnits);
         if(validTargets.Count > 0)
         {
             currentPlayerTarget = validTargets[0];
@@ -58,27 +73,26 @@ public class CombatManager : MonoBehaviour
 
     public void attemptChangePlayerTarget(GameObject preferredTarget)
     {
-        if(getValidTargets(enemyUnits).Contains(preferredTarget))
+        if(getValidTargets(enemyUnits).Contains(preferredTarget.GetComponent<CharacterSheetBehaviour>()))
         {
-            currentPlayerTarget = preferredTarget;
+            currentPlayerTarget = preferredTarget.GetComponent<CharacterSheetBehaviour>();
             OnPlayerTargetChanged?.Invoke(currentPlayerTarget);
         }
     }
 
-    public List<GameObject> getValidTargets(List<GameObject> fromSet)
+    public List<CharacterSheetBehaviour> getValidTargets(List<CharacterSheetBehaviour> fromSet)
     {
-        List<GameObject> activeObjs = fromSet.Where(p => p.activeSelf).ToList();
-        List<GameObject> tauntObjs = new List<GameObject>();
-        List<GameObject> stealthObjs = new List<GameObject>();
+        List<CharacterSheetBehaviour> activeObjs = fromSet.Where(p => p.gameObject.activeSelf).ToList();
+        List<CharacterSheetBehaviour> tauntObjs = new List<CharacterSheetBehaviour>();
+        List<CharacterSheetBehaviour> stealthObjs = new List<CharacterSheetBehaviour>();
 
-        foreach(GameObject obj in activeObjs)
+        foreach(CharacterSheetBehaviour obj in activeObjs)
         {
-            CharacterSheetBehaviour charSheet = obj.GetComponent<CharacterSheetBehaviour>();
-            if(charSheet.statusEffects.Where(effect => effect.statusEffectTemplate.statusName.Equals("Taunt")).Any())
+            if(obj.statusEffects.Where(effect => effect.statusEffectTemplate.statusName.Equals("Taunt")).Any())
             {
                 tauntObjs.Add(obj);
             }
-            if (charSheet.statusEffects.Where(effect => effect.statusEffectTemplate.statusName.Equals("Stealth")).Any())
+            if (obj.statusEffects.Where(effect => effect.statusEffectTemplate.statusName.Equals("Stealth")).Any())
             {
                 stealthObjs.Add(obj);
             }
@@ -94,7 +108,7 @@ public class CombatManager : MonoBehaviour
         }
         else
         {
-            foreach(GameObject stealthObj in stealthObjs)
+            foreach(CharacterSheetBehaviour stealthObj in stealthObjs)
             {
                 activeObjs.Remove(stealthObj);
             }
@@ -104,11 +118,82 @@ public class CombatManager : MonoBehaviour
 
     public void useAbility(UnitAbility ability)
     {
-        Debug.Log("Using ability: " + ability.name);
+        Debug.Log("Using ability: " + ability.abilitySequence.abilityName);
         foreach(StatusAction action in ability.abilitySequence.actionSequence)
         {
-            action.performAction(ability.gameObject, currentPlayerTarget);
+            action.performAction(ability.gameObject, currentPlayerTarget.gameObject);
         }
+    }
+
+    public void handleEndOfTurn(CharacterSheetBehaviour characterWhoEndedTurn)
+    {
+        StartCoroutine("findNextReadyCharacter");
+    }
+
+    private IEnumerable findNextReadyCharacter()
+    {
+        CharacterSheetBehaviour readyChar;
+        while((readyChar = getHighestReadyCharacter()) == null)
+        {
+            tickAllSpeed();
+            yield return new WaitForSeconds(0.2f);
+        }
+        OnCharacterTurnStart?.Invoke(readyChar);
+    }
+
+    private CharacterSheetBehaviour getHighestReadyCharacter()
+    {
+        CharacterSheetBehaviour maxReady = null;
+        float maxCounter = 0;
+
+        foreach (CharacterSheetBehaviour obj in playerUnits)
+        {
+            float objTurn = obj.getValue("turn");
+            if (objTurn > 1 && objTurn > maxCounter)
+            {
+                maxReady = obj;
+                maxCounter = objTurn;
+            }
+        }
+        /*
+        foreach (CharacterSheetBehaviour obj in enemyUnits)
+        {
+            float objTurn = obj.getValue("turn");
+            if (objTurn > 1 && objTurn > maxCounter)
+            {
+                maxReady = obj;
+                maxCounter = objTurn;
+            }
+        }*/
+
+        return maxReady;
+    }
+
+    private void tickAllSpeed()
+    {
+        float maxSpeed = getMaximumSpeed();
+        foreach (CharacterSheetBehaviour obj in playerUnits)
+        {
+            obj.modifyStatByValue("turn", obj.getValue("speed") / (maxSpeed * 10));
+        }
+        foreach (CharacterSheetBehaviour obj in enemyUnits)
+        {
+            obj.modifyStatByValue("turn", obj.getValue("speed") / (maxSpeed * 10));
+        }
+    }
+
+    private float getMaximumSpeed()
+    {
+        float max = 1;
+        foreach(CharacterSheetBehaviour obj in playerUnits)
+        {
+            max = Math.Max(max, obj.getValue("speed"));
+        }
+        foreach (CharacterSheetBehaviour obj in enemyUnits)
+        {
+            max = Math.Max(max, obj.getValue("speed"));
+        }
+        return max;
     }
 
     /*[SerializeField]

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[RequireComponent(typeof(CharacterSheetBehaviour))]
 public class UnitHealthBehaviour : MonoBehaviour
 {
     public event Action<UnitHealthBehaviour> UnitHealthChanged;
@@ -20,6 +21,38 @@ public class UnitHealthBehaviour : MonoBehaviour
     public int healthMax;
     [SerializeField]
     private bool invulnerable = false;
+
+    private void Start()
+    {
+        CharacterSheetBehaviour charSheet = GetComponent<CharacterSheetBehaviour>();
+        setHealth((int)charSheet.getValue("health"), (int)charSheet.getValue("shield"));
+        charSheet.OnStatsUpdated += handleCharSheetValueChange;
+    }
+
+    private void handleCharSheetValueChange(CharacterSheetBehaviour characterSheetBehaviour)
+    {
+        bool statChanged = false;
+        float statSheetHealth = characterSheetBehaviour.getValue("health");
+        if (statSheetHealth != healthMax)
+        {
+            float healthPercent = (float)healthCurrent / healthMax;
+            healthCurrent = (int)(healthPercent * statSheetHealth);
+            healthMax = (int)statSheetHealth;
+            statChanged = true;
+        }
+        float statSheetShield = characterSheetBehaviour.getValue("shield");
+        if (statSheetShield != shieldMax)
+        {
+            float shieldPercent = (float)shieldCurrent / shieldMax;
+            shieldCurrent = (int)(shieldPercent * statSheetShield);
+            shieldMax = (int)statSheetShield;
+            statChanged = true;
+        }
+        if(statChanged)
+        {
+            UnitHealthChanged?.Invoke(this);
+        }
+    }
 
     public bool isDead()
     {
