@@ -14,4 +14,6 @@ public class UnitAbilityTemplate : ScriptableObject
     public int cooldown;
 
     public List<StatusAction> actionSequence;
+
+    public Sprite abilityIcon;
 }

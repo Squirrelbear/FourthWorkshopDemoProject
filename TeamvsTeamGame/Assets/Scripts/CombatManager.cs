@@ -17,14 +17,16 @@ public class CombatManager : MonoBehaviour
     public List<CharacterSheetBehaviour> playerUnits;
     public List<CharacterSheetBehaviour> enemyUnits;
 
-    public CharacterSheetBehaviour currentPlayerTarget; 
+    public CharacterSheetBehaviour activeTurnUnit;
+    public CharacterSheetBehaviour currentPlayerTarget;
+
+    public bool firstUpdate = true;
 
     void Awake()
     {
         instance = this;
         attackQueue = new Queue<QueuedAttack>();
         OnCharacterTurnEnded += handleEndOfTurn;
-        handleEndOfTurn(null);
     }
 
     [SerializeField]
@@ -41,6 +43,12 @@ public class CombatManager : MonoBehaviour
 
     private void Update()
     {
+        if(firstUpdate)
+        {
+            handleEndOfTurn(null);
+            firstUpdate = false;
+        }
+
         if(attackQueue.Count == 0)
         {
             return;
@@ -49,6 +57,10 @@ public class CombatManager : MonoBehaviour
         if(attackQueue.Peek().isDone)
         {
             attackQueue.Dequeue();
+            if(attackQueue.Count == 0)
+            {
+                OnCharacterTurnEnded?.Invoke(activeTurnUnit);
+            }
         }
         else if(!attackQueue.Peek().isStarted)
         {
@@ -118,19 +130,25 @@ public class CombatManager : MonoBehaviour
 
     public void useAbility(UnitAbility ability)
     {
+        InterfaceManager.instance.disableAllButtons();
         Debug.Log("Using ability: " + ability.abilitySequence.abilityName);
         foreach(StatusAction action in ability.abilitySequence.actionSequence)
         {
             action.performAction(ability.gameObject, currentPlayerTarget.gameObject);
         }
+        ability.cooldown = ability.abilitySequence.cooldown+1;
+        if(attackQueue.Count == 0)
+        {
+            OnCharacterTurnEnded?.Invoke(activeTurnUnit);
+        }
     }
 
     public void handleEndOfTurn(CharacterSheetBehaviour characterWhoEndedTurn)
     {
-        StartCoroutine("findNextReadyCharacter");
+        StartCoroutine(findNextReadyCharacter());
     }
 
-    private IEnumerable findNextReadyCharacter()
+    private IEnumerator findNextReadyCharacter()
     {
         CharacterSheetBehaviour readyChar;
         while((readyChar = getHighestReadyCharacter()) == null)
@@ -138,7 +156,10 @@ public class CombatManager : MonoBehaviour
             tickAllSpeed();
             yield return new WaitForSeconds(0.2f);
         }
+        activeTurnUnit = readyChar;
+        activeTurnUnit.modifyStatByValue("turn",-1);
         OnCharacterTurnStart?.Invoke(readyChar);
+        yield return null;
     }
 
     private CharacterSheetBehaviour getHighestReadyCharacter()
@@ -172,6 +193,7 @@ public class CombatManager : MonoBehaviour
     private void tickAllSpeed()
     {
         float maxSpeed = getMaximumSpeed();
+        Debug.Log("Ticking with max speed: " + maxSpeed);
         foreach (CharacterSheetBehaviour obj in playerUnits)
         {
             obj.modifyStatByValue("turn", obj.getValue("speed") / (maxSpeed * 10));

@@ -8,6 +8,7 @@ public class CharacterSheetBehaviour : MonoBehaviour
     public event Action<CharacterSheetBehaviour> OnStatsUpdated;
 
     [SerializeField] private CharacterTemplate baseStats;
+    [SerializeField] private UnitAbilityTemplate[] abilityTemplates;
 
     [SerializeField] private Dictionary<string, float> statValues;
 
@@ -15,18 +16,33 @@ public class CharacterSheetBehaviour : MonoBehaviour
     [SerializeField] private HashSet<CharacterTemplate.CharacterTag> characterTags;
 
     public List<StatusEffect> statusEffects;
+    public List<UnitAbility> abilityList;
 
     // Start is called before the first frame update
     void Awake()
     {
         statusEffects = new List<StatusEffect>();
         initialiseFromTemplate();
+        CombatManager.instance.OnCharacterTurnEnded += handleOwnTurnEnd;
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    private void handleOwnTurnEnd(CharacterSheetBehaviour characterSheetBehaviour)
+    {
+        if(characterSheetBehaviour == this)
+        {
+            foreach(UnitAbility ability in abilityList)
+            {
+                if (ability.cooldown > 0) {
+                    ability.cooldown--;
+                }
+            }
+        }
     }
 
     public float getValue(string fieldName)
@@ -98,5 +114,11 @@ public class CharacterSheetBehaviour : MonoBehaviour
 
         statValues.Add("counterChance", 0);
         statValues.Add("turn", 0);
+
+        abilityList = new List<UnitAbility>();
+        foreach(UnitAbilityTemplate template in abilityTemplates)
+        {
+            abilityList.Add(new UnitAbility(template, gameObject));
+        }
     }
 }
