@@ -6,13 +6,13 @@ using UnityEngine;
 
 public class CombatManager : MonoBehaviour
 {
-    public event Action<CharacterSheetBehaviour> OnCharacterTurnStart;
-    public event Action<CharacterSheetBehaviour> OnCharacterTurnEnded;
-    public event Action<CharacterSheetBehaviour> OnInitialSetup;
-    public event Action<CharacterSheetBehaviour> OnPlayerTargetChanged;
+    public static event Action<CharacterSheetBehaviour> OnCharacterTurnStart;
+    public static event Action<CharacterSheetBehaviour> OnCharacterTurnEnded;
+    public static event Action<CharacterSheetBehaviour> OnInitialSetup;
+    public static event Action<CharacterSheetBehaviour> OnPlayerTargetChanged;
 
     public Queue<QueuedAttack> attackQueue;
-    public static CombatManager instance;
+    public static CombatManager instance { get; private set; }
 
     public List<CharacterSheetBehaviour> playerUnits;
     public List<CharacterSheetBehaviour> enemyUnits;
@@ -31,10 +31,10 @@ public class CombatManager : MonoBehaviour
 
     [SerializeField]
     private GameObject testAttackTarget;
+    //[SerializeField]
+    //private GameObject testAttacker;
     [SerializeField]
-    private GameObject testAttacker;
-    [SerializeField]
-    private HealthBarBehaviour testHealthBar;
+   private HealthBarBehaviour testHealthBar;
 
     private void Start()
     {
@@ -45,6 +45,7 @@ public class CombatManager : MonoBehaviour
     {
         if(firstUpdate)
         {
+            InterfaceManager.instance.setupInterfaceForUnits(playerUnits);
             handleEndOfTurn(null);
             firstUpdate = false;
         }

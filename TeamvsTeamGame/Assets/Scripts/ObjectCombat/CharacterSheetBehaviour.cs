@@ -23,7 +23,7 @@ public class CharacterSheetBehaviour : MonoBehaviour
     {
         statusEffects = new List<StatusEffect>();
         initialiseFromTemplate();
-        CombatManager.instance.OnCharacterTurnEnded += handleOwnTurnEnd;
+        CombatManager.OnCharacterTurnEnded += handleOwnTurnEnd;
     }
 
     // Update is called once per frame

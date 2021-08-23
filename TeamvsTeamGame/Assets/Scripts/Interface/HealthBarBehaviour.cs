@@ -22,6 +22,11 @@ public class HealthBarBehaviour : MonoBehaviour
     [SerializeField]
     private TMPro.TextMeshProUGUI nameLabel;
 
+    [SerializeField]
+    private TMPro.TextMeshProUGUI turnMeterLabel;
+    [SerializeField]
+    private Slider turnMeterBar;
+
     public bool firstUpdate = true;
 
     // Start is called before the first frame update
@@ -48,6 +53,7 @@ public class HealthBarBehaviour : MonoBehaviour
         if(unitHealth != null)
         {
             unitHealth.UnitHealthChanged -= updateHealth;
+            unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatsUpdated -= updateTurnMeter;
         }
 
         unitHealth = unitHealthBehaviour;
@@ -55,6 +61,9 @@ public class HealthBarBehaviour : MonoBehaviour
         transform.position = objectPos;
         unitHealth.UnitHealthChanged += updateHealth;
         //updateHealth(unitHealth);
+        CharacterSheetBehaviour charSheet = unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>();
+        nameLabel.text = charSheet.characterName;
+        charSheet.OnStatsUpdated += updateTurnMeter;
     }
 
     private void updateHealth(UnitHealthBehaviour unitHealth)
@@ -66,7 +75,12 @@ public class HealthBarBehaviour : MonoBehaviour
         protectionLabel.text = unitHealth.protectionCurrent.ToString();
         shieldLabel.text = unitHealth.shieldCurrent.ToString();
         healthLabel.text = unitHealth.healthCurrent.ToString();
+    }
 
-        nameLabel.text = unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().characterName;
+    private void updateTurnMeter(CharacterSheetBehaviour characterSheetBehaviour)
+    {
+        float turnMeterPercent = Mathf.Min(1, characterSheetBehaviour.getValue("turn"));
+        turnMeterBar.value = turnMeterPercent;
+        turnMeterLabel.text = (turnMeterPercent*100).ToString("0") + "%";
     }
 }

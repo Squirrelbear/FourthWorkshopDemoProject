@@ -8,6 +8,9 @@ public class InterfaceManager : MonoBehaviour
 
     public static InterfaceManager instance;
 
+    public GameObject unitStatusInterfacePrefab;
+    public GameObject interfaceParentReference;
+
     private void Awake()
     {
         instance = this;
@@ -16,7 +19,7 @@ public class InterfaceManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        CombatManager.instance.OnCharacterTurnStart += handleCharacterChange;
+        CombatManager.OnCharacterTurnStart += handleCharacterChange;
     }
 
     // Update is called once per frame
@@ -47,6 +50,15 @@ public class InterfaceManager : MonoBehaviour
                 abilityIconSet[i].GetComponent<UseAbilityButtonBehaviour>().linkAbility(abilities[i]);
                 abilityIconSet[i].SetActive(true);
             }
+        }
+    }
+
+    public void setupInterfaceForUnits(List<CharacterSheetBehaviour> unitList)
+    {
+        foreach (CharacterSheetBehaviour unit in unitList)
+        {
+            var newObj = Instantiate(unitStatusInterfacePrefab, interfaceParentReference.transform);
+            newObj.GetComponent<HealthBarBehaviour>().setAssociatedUnit(unit.GetComponent<UnitHealthBehaviour>());
         }
     }
 }
