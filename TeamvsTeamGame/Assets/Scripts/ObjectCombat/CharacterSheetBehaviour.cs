@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CharacterSheetBehaviour : MonoBehaviour
 {
     public event Action<CharacterSheetBehaviour> OnStatsUpdated;
+    public event Action<CharacterSheetBehaviour> OnStatusEffectsChanged;
 
     [SerializeField] private CharacterTemplate baseStats;
     [SerializeField] private UnitAbilityTemplate[] abilityTemplates;
@@ -32,6 +34,43 @@ public class CharacterSheetBehaviour : MonoBehaviour
         
     }
 
+    public void addStatusEffect(StatusEffect addEffect)
+    {
+        // increase by 1 for abilities cast on self to prevent tick out at end of turn
+        if(addEffect.attacker == this)
+        {
+            addEffect.cooldown++;
+        }
+        bool found = false;
+        foreach(StatusEffect effect in statusEffects)
+        {
+            if(effect.statusEffectTemplate.statusName.Equals(addEffect.statusEffectTemplate.statusName))
+            {
+                effect.refresh(addEffect);
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+        {
+            statusEffects.Add(addEffect);
+        }
+
+        OnStatusEffectsChanged?.Invoke(this);
+    }
+
+    public void dispellAll(bool buffs)
+    {
+        int beforeCount = statusEffects.Count;
+        statusEffects = statusEffects
+            .Where(effect => !effect.statusEffectTemplate.isBuff && effect.statusEffectTemplate.isDispellable)
+            .ToList();
+        if (beforeCount != statusEffects.Count)
+        {
+            OnStatusEffectsChanged?.Invoke(this);
+        }
+    }
+
     private void handleOwnTurnEnd(CharacterSheetBehaviour characterSheetBehaviour)
     {
         if(characterSheetBehaviour == this)
@@ -41,6 +80,15 @@ public class CharacterSheetBehaviour : MonoBehaviour
                 if (ability.cooldown > 0) {
                     ability.cooldown--;
                 }
+            }
+            foreach (StatusEffect effect in statusEffects)
+            {
+                effect.tick();
+            }
+            int effectCount = statusEffects.RemoveAll(effect => effect.isExpired);
+            if(effectCount > 0)
+            {
+                OnStatusEffectsChanged?.Invoke(this);
             }
         }
     }

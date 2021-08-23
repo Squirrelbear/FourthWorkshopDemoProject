@@ -27,6 +27,9 @@ public class HealthBarBehaviour : MonoBehaviour
     [SerializeField]
     private Slider turnMeterBar;
 
+    [SerializeField]
+    private List<Image> statusIconSlots;
+
     public bool firstUpdate = true;
 
     // Start is called before the first frame update
@@ -35,6 +38,8 @@ public class HealthBarBehaviour : MonoBehaviour
         if (unitHealth != null)
         {
             unitHealth.UnitHealthChanged -= updateHealth;
+            unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatsUpdated -= updateTurnMeter;
+            unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatusEffectsChanged -= handleStatusIconChange;
         }
     }
 
@@ -54,6 +59,7 @@ public class HealthBarBehaviour : MonoBehaviour
         {
             unitHealth.UnitHealthChanged -= updateHealth;
             unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatsUpdated -= updateTurnMeter;
+            unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatusEffectsChanged -= handleStatusIconChange;
         }
 
         unitHealth = unitHealthBehaviour;
@@ -62,6 +68,7 @@ public class HealthBarBehaviour : MonoBehaviour
         unitHealth.UnitHealthChanged += updateHealth;
         //updateHealth(unitHealth);
         CharacterSheetBehaviour charSheet = unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>();
+        unitHealth.gameObject.GetComponent<CharacterSheetBehaviour>().OnStatusEffectsChanged += handleStatusIconChange;
         nameLabel.text = charSheet.characterName;
         charSheet.OnStatsUpdated += updateTurnMeter;
     }
@@ -82,5 +89,28 @@ public class HealthBarBehaviour : MonoBehaviour
         float turnMeterPercent = Mathf.Min(1, characterSheetBehaviour.getValue("turn"));
         turnMeterBar.value = turnMeterPercent;
         turnMeterLabel.text = (turnMeterPercent*100).ToString("0") + "%";
+    }
+
+    private void handleStatusIconChange(CharacterSheetBehaviour characterSheetBehaviour)
+    {
+        int iconID = 0;
+        foreach(StatusEffect effect in characterSheetBehaviour.statusEffects)
+        {
+            if(effect.statusEffectTemplate.effectSprite != null)
+            {
+                statusIconSlots[iconID].sprite = effect.statusEffectTemplate.effectSprite;
+                statusIconSlots[iconID].gameObject.SetActive(true);
+                iconID++;
+            }
+
+            if(iconID == statusIconSlots.Count)
+            {
+                break;
+            }
+        }
+        while(iconID < statusIconSlots.Count)
+        {
+            statusIconSlots[iconID++].gameObject.SetActive(false);
+        }
     }
 }

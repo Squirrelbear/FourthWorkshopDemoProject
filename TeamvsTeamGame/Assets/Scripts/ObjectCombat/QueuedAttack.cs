@@ -28,6 +28,10 @@ public class QueuedAttack
         {
             beginMoveToAttack();
         }
+        else if(statusAction.attackVisualType == AttackTargetStatusAction.AttackVisualType.Projectile)
+        {
+            beginRangedAttack();
+        }
         else
         {
             // TODO
@@ -129,6 +133,36 @@ public class QueuedAttack
             Debug.Log("Multistrike with " + statusAction.multiStrikeChance + " chance and random: " + randValue);
             hasMultistriked = true;
             beginAttack();
+        }
+        else
+        {
+            isDone = true;
+        }
+    }
+
+    private void beginRangedAttack()
+    {
+        UnitRangedAttackBehaviour unitRangedAttackBehaviour = attacker.GetComponent<UnitRangedAttackBehaviour>();
+        unitRangedAttackBehaviour.OnAttackTargetReached += handleAttackTargetReached;
+        unitRangedAttackBehaviour.OnFinishedAllProjectiles += handleFinishedAttack;
+        unitRangedAttackBehaviour.fireProjectiles(target, statusAction.timeToReachTarget);
+    }
+
+    private void handleAttackTargetReached(UnitRangedAttackBehaviour unitRangedAttackBehaviour)
+    {
+        unitRangedAttackBehaviour.OnAttackTargetReached -= handleAttackTargetReached;
+        processDamageStep();
+    }
+
+    private void handleFinishedAttack(UnitRangedAttackBehaviour unitRangedAttackBehaviour)
+    {
+        unitRangedAttackBehaviour.OnFinishedAllProjectiles -= handleFinishedAttack;
+        float randValue = Random.value;
+        if (!hasMultistriked && statusAction.multiStrikeChance > randValue)
+        {
+            Debug.Log("Multistrike with " + statusAction.multiStrikeChance + " chance and random: " + randValue);
+            hasMultistriked = true;
+            beginRangedAttack();
         }
         else
         {

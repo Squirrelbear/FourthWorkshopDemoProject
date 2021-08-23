@@ -11,6 +11,8 @@ public class StatusEffectTemplate : ScriptableObject
     [SerializeField] public bool isDispellable;
     [SerializeField] public bool isCopyable;
     [SerializeField] public int duration;
+    [SerializeField] public int maxStacks = 1;
+    [SerializeField] public Sprite effectSprite;
     [SerializeField] public StatusAction[] actionList;
 
     public void applyEffect(GameObject attacker, GameObject defender)
