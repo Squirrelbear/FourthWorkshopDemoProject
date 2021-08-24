@@ -14,6 +14,11 @@ public class IfHasTagStatusAction : StatusAction
 
     public override void performAction(GameObject attacker, GameObject defender)
     {
+        if(defenderAs == EnemyOrAssistTarget.Assist)
+        {
+            defender = CombatManager.instance.getAssist().gameObject;
+        }
+
         if(isConditionTrue(defender))
         {
             executeIfTrue?.performAction(attacker, defender);
@@ -48,7 +53,7 @@ public class IfHasTagStatusAction : StatusAction
                     return true;
                 }
             }
-            else if(anyOrAll == AnyOrAll.Any)
+            else if(anyOrAll == AnyOrAll.All)
             {
                 return false;
             }

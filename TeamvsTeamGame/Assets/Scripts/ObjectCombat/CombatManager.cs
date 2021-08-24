@@ -10,6 +10,8 @@ public class CombatManager : MonoBehaviour
     public static event Action<CharacterSheetBehaviour> OnCharacterTurnEnded;
     public static event Action<CharacterSheetBehaviour> OnInitialSetup;
     public static event Action<CharacterSheetBehaviour> OnPlayerTargetChanged;
+    public static event Action<CharacterSheetBehaviour> OnAllyTargetSelectionChanged;
+
 
     public Queue<QueuedAttack> attackQueue;
     public static CombatManager instance { get; private set; }
@@ -19,6 +21,7 @@ public class CombatManager : MonoBehaviour
 
     public CharacterSheetBehaviour activeTurnUnit;
     public CharacterSheetBehaviour currentPlayerTarget;
+    public CharacterSheetBehaviour currentAllyTarget;
 
     public bool firstUpdate = true;
 
@@ -217,6 +220,32 @@ public class CombatManager : MonoBehaviour
             max = Math.Max(max, obj.getValue("speed"));
         }
         return max;
+    }
+
+    public void attemptChangeAllyTarget(CharacterSheetBehaviour newTarget)
+    {
+        // TODO would need to check if the target has a taunt ability/stealth and if there are 
+        // other targets that should be selected instead.
+        if (!playerUnits.Contains(newTarget) || !newTarget.gameObject.activeSelf)
+        {
+            return;
+        }
+
+        currentAllyTarget = newTarget;
+        OnAllyTargetSelectionChanged?.Invoke(newTarget);
+    }
+
+    public CharacterSheetBehaviour getAssist()
+    {
+        int selectionID = 0;
+        while(currentAllyTarget == null && selectionID < playerUnits.Count)
+        {
+            if (playerUnits[selectionID] != activeTurnUnit) {
+                attemptChangeAllyTarget(playerUnits[selectionID]);
+            }
+        }
+
+        return currentAllyTarget == null ? activeTurnUnit : currentAllyTarget;
     }
 
     /*[SerializeField]

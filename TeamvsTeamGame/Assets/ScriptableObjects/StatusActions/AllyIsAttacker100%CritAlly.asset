@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a464a3852af8f504385c6dcc02b2bfbd, type: 3}
+  m_Name: AllyIsAttacker100%CritAlly
+  m_EditorClassIdentifier: 
+  defenderAs: 1
+  anyOrAll: 1
+  tags: 08000000
+  executeIfTrue: {fileID: 11400000, guid: c7cff413abcaba9448aacc1ce7e684cb, type: 2}
+  executeIfFalse: {fileID: 0}

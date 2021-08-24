@@ -78,7 +78,7 @@ public class UnitHealthBehaviour : MonoBehaviour
         }
         if(protection > 0)
         {
-            protection += protection;
+            protectionCurrent += protection;
         }
         UnitHealthChanged?.Invoke(this);
     }

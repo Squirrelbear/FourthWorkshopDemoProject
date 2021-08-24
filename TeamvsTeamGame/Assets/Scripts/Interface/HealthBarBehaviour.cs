@@ -73,11 +73,16 @@ public class HealthBarBehaviour : MonoBehaviour
         charSheet.OnStatsUpdated += updateTurnMeter;
     }
 
+    public UnitHealthBehaviour getAssociatedUnit()
+    {
+        return unitHealth;
+    }
+
     private void updateHealth(UnitHealthBehaviour unitHealth)
     {
         currentHealthBar.value = (float)unitHealth.healthCurrent / unitHealth.healthMax;
         currentShieldBar.value = (float)unitHealth.shieldCurrent / unitHealth.shieldMax;
-        currentProtectionBar.value = (float)unitHealth.protectionCurrent / unitHealth.healthMax;
+        currentProtectionBar.value = Mathf.Min(1,(float)unitHealth.protectionCurrent / unitHealth.healthMax);
 
         protectionLabel.text = unitHealth.protectionCurrent.ToString();
         shieldLabel.text = unitHealth.shieldCurrent.ToString();

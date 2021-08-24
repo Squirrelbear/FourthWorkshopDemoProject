@@ -29,7 +29,7 @@ public class ApplyStatusEffectStatusAction : StatusAction
         }
         else
         {
-            Debug.LogError("Not setup yet...");
+            CombatManager.instance.getAssist().addStatusEffect(effectToApply);
         }
     }
 
